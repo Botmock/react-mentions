@@ -1,4 +1,4 @@
-import React, { Children } from 'react'
+import React, { Children, forwardRef, useRef, useImperativeHandle } from 'react'
 import {
   applyChangeToValue,
   countSuggestions,
@@ -91,6 +91,8 @@ const propTypes = {
           : PropTypes.instanceOf(Element),
     }),
   ]),
+  mentionsRef: PropTypes.any,
+
 
   children: PropTypes.oneOfType([
     PropTypes.element,
@@ -117,6 +119,7 @@ class MentionsInput extends React.Component {
     this.handleCopy = this.handleCopy.bind(this)
     this.handleCut = this.handleCut.bind(this)
     this.handlePaste = this.handlePaste.bind(this)
+    this.insertText = this.insertText.bind(this);
 
     this.state = {
       focusIndex: 0,
@@ -170,7 +173,14 @@ class MentionsInput extends React.Component {
   }
 
   setContainerElement = (el) => {
-    this.containerElement = el
+    this.containerElement = el;
+    const { mentionsRef } = this.props;
+    if (typeof mentionsRef === 'function') {
+      mentionsRef(this);
+    }
+    else if (mentionsRef) {
+      mentionsRef.current = this;
+    }
   }
 
   getInputProps = () => {
@@ -318,6 +328,45 @@ class MentionsInput extends React.Component {
     if (this.props.valueLink) {
       return this.props.valueLink.requestChange(event.target.value, ...args)
     }
+  }
+
+  insertText(text) {
+    const { selectionStart, selectionEnd } = this.inputElement
+    const { value, children } = this.props
+
+    const config = readConfigFromChildren(children)
+
+    const markupStartIndex = mapPlainTextIndex(
+      value,
+      config,
+      selectionStart,
+      'START'
+    )
+    const markupEndIndex = mapPlainTextIndex(value, config, selectionEnd, 'END')
+
+
+    const newValue = spliceString(
+      value,
+      markupStartIndex,
+      markupEndIndex,
+      text
+    ).replace(/\r/g, '')
+
+
+    const newPlainTextValue = getPlainText(newValue, config)
+    //
+    const eventMock = { target: { ...this.inputElement, value: newValue } }
+    //
+    this.executeOnChange(
+      eventMock,
+      newValue,
+      newPlainTextValue,
+      getMentions(newValue, config)
+    )
+
+    this.inputElement.selectionStart = selectionStart;
+    this.inputElement.selectionEnd = selectionEnd;
+    this.inputElement.focus();
   }
 
   handlePaste(event) {
@@ -1045,4 +1094,21 @@ const styled = defaultStyle(
   })
 )
 
-export default styled(MentionsInput)
+const StyledMentionsInput = styled(MentionsInput);
+
+const MentionsInputWrapper = forwardRef((props, ref) => {
+  useImperativeHandle(
+    ref,
+    () => ({
+      showAlert() {
+        console.log('child component', ref);
+      }
+    }),
+  )
+  return (
+    <StyledMentionsInput {...props} />
+  )
+})
+
+
+export default StyledMentionsInput;

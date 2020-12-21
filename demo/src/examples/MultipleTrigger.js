@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 
 import { Mention, MentionsInput } from '../../../src'
 
@@ -12,16 +12,25 @@ import defaultMentionStyle from './defaultMentionStyle'
 const emailRegex = /(([^\s@]+@[^\s@]+\.[^\s@]+))$/
 
 function MultipleTriggers({ value, data, onChange, onAdd }) {
+
+  let test = useRef();
+
+  const insertText = () => {
+    if (test.current) {
+      test.current.insertText('@[John Doe](user:johndoe)');
+    }
+  }
   return (
     <div className="multiple-triggers">
       <h3>Multiple trigger patterns</h3>
       <p>Mention people using '@' + username or type an email address</p>
-
+      <button onClick={insertText}>Insert</button>
       <MentionsInput
         value={value}
         onChange={onChange}
-        style={defaultStyle}
-        placeholder={"Mention people using '@'"}
+        singleLine
+        placeholder={"Mention people using '@'2"}
+        mentionsRef={test}
       >
         <Mention
           markup="@[__display__](user:__id__)"

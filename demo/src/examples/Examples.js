@@ -53,16 +53,7 @@ export default function Examples() {
     <StylesViaJss>
       <div>
         <MultipleTrigger data={users} />
-        <SingleLine data={users} />
-        <SingleLineIgnoringAccents data={users} />
-        <Scrollable data={users} />
-        <Advanced data={users} />
-        <CutCopyPaste data={users} />
-        <CssModules data={users} />
-        <AsyncGithubUserMentions data={users} />
-        <Emojis data={users} />
-        <SuggestionPortal data={users} />
-        <BottomGuard data={users} />
+        
       </div>
     </StylesViaJss>
   )

@@ -10,7 +10,7 @@ const Demo = () => (
       <span role="img" aria-labelledby="yay!">
         🙌
       </span>
-      &nbsp; brought to you by Signavio, docs and code on Github:{' '}
+      &nbsp; dbrought to you by Signavio, docs and code on Github:{' '}
       <a href="https://github.com/signavio/react-mentions">
         https://github.com/signavio/react-mentions
       </a>{' '}
